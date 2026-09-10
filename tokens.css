@@ -1,0 +1,108 @@
+/* SiteCheck Legal — design tokens
+ * See DESIGN.md. Physical reference: a notarised document — oxblood seal on
+ * document stock, ink folio cover. No gold, no navy: those are the legal
+ * category's first reflex.
+ * Every pair below was computed, not eyeballed, and all sit inside sRGB.
+ */
+:root {
+  /* ── Surfaces ─────────────────────────────────────────
+     Neutrals are tinted to the brand's own 25°, not warmed by default —
+     a warm near-white is the saturated AI ground. */
+  --ground:       oklch(97.6% 0.005 25);
+  --ground-2:     oklch(94.5% 0.008 25);
+  --ground-3:     oklch(91%   0.010 25);
+
+  /* The folio: dark bands that carry authority */
+  --folio:        oklch(19%   0.020 25);
+  --folio-2:      oklch(25%   0.020 25);
+  --folio-rule:   oklch(33%   0.018 25);
+  --on-folio:     oklch(95%   0.008 25);
+  --on-folio-2:   oklch(76%   0.012 25);
+
+  /* ── Ink ──────────────────────────────────────────────── */
+  --ink:          oklch(22%   0.018 25);   /* 16.21:1 on ground */
+  --ink-2:        oklch(34%   0.016 25);   /* 11.03:1 */
+  --muted:        oklch(50%   0.014 25);   /*  5.63:1 */
+  --rule:         oklch(86%   0.010 25);
+  --rule-strong:  oklch(64%   0.014 25);   /*  3.15:1 — interactive borders */
+
+  /* ── Role 1 · Seal: breach, risk, action ──────────────── */
+  --seal:         oklch(45%   0.165 25);   /*  7.56:1 on ground */
+  --seal-ink:     oklch(98%   0.004 25);   /*  7.74:1 on seal */
+  --seal-wash:    oklch(95.5% 0.022 25);
+  --seal-bright:  oklch(65%   0.180 28);   /*  5.28:1 on folio, 4.58:1 on folio-2 */
+
+  /* ── Role 2 · Verdigris: checked, in order ────────────── */
+  --verd:         oklch(43%   0.078 168);  /*  7.47:1 on ground */
+  --verd-wash:    oklch(95.5% 0.020 168);
+  --verd-bright:  oklch(68%   0.110 168);  /*  6.78:1 on folio */
+
+  --focus:        oklch(45%   0.165 25);
+
+  /* ── Type ─────────────────────────────────────────────
+     Slab serif + humanist grotesque, paired on a contrast axis.
+     Both carry full Cyrillic — the brief is Russian, so that gates the choice. */
+  --font-display: "Bitter", Georgia, "Times New Roman", serif;
+  --font-body:    "Golos Text", system-ui, -apple-system, sans-serif;
+
+  /* Modular scale, ratio 1.25, body at 17px for a 40+ readership */
+  --text-2xs:     0.8125rem;
+  --text-xs:      0.875rem;
+  --text-sm:      0.9375rem;
+  --text-base:    1.0625rem;
+  --text-md:      1.25rem;
+  --text-lg:      1.5rem;
+  --text-xl:      1.875rem;
+  --text-2xl:     2.25rem;
+  --text-3xl:     2.75rem;
+  --text-display-s: clamp(1.75rem, 2.6vw + 0.9rem, 2.75rem);
+  /* Кегль течёт по ширине окна так, чтобы заголовок героя всегда ложился в две
+     строки: замер показал, что самая длинная строка «требованиям 152-ФЗ и
+     168-ФЗ?» занимает 808px при 56px, и колонка обязана быть не уже. */
+  --text-display:   clamp(1.8125rem, 6.25vw - 2.125rem, 3.5rem);
+
+  /* ── Space — 4pt, named by role ───────────────────────── */
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs:  0.5rem;
+  --space-sm:  0.75rem;
+  --space-md:  1rem;
+  --space-lg:  1.5rem;
+  --space-xl:  2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 5.5rem;
+  --space-4xl: 8rem;
+
+  /* Documents have corners, not pills */
+  --radius-sm:   3px;
+  --radius-md:   5px;
+  --radius-lg:   8px;
+
+  --rule-hair:  1px;
+  --rule-thick: 2px;
+  --rule-heavy: 3px;
+
+  /* ── Motion ───────────────────────────────────────────── */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long:  460ms;
+
+  /* ── Z — semantic, never arbitrary ────────────────────── */
+  --z-base:     1;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-modal:    400;
+  --z-toast:    500;
+
+  /* ── Frame ────────────────────────────────────────────── */
+  --nav-height:  68px;
+  /* 90rem вместо 78rem: при прежней ширине заголовок в две строки оставлял
+     бланку заявки 230px — в такую колонку форма не помещается. */
+  --page-max:    90rem;
+  --page-gutter: clamp(1rem, 4vw, 3.5rem);
+  --grid-step:   38px;
+}

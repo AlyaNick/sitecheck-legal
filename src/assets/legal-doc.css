@@ -1,0 +1,221 @@
+/* Правовой документ внутри модалки. Набран как настоящий документ: сквозная
+   нумерация, оглавление, якорь на каждом пункте — по номеру удобно ссылаться
+   в переписке. Навигационные ссылки остаются кликабельными, но не шумят. */
+
+.doc {
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+.doc-head {
+  padding-bottom: var(--space-lg);
+  border-bottom: var(--rule-heavy) solid var(--ink);
+}
+
+.doc-kicker {
+  display: inline-block;
+  margin-bottom: var(--space-xs);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--seal);
+}
+
+.doc h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.doc-meta {
+  margin-top: var(--space-sm);
+  font-size: var(--text-2xs);
+  color: var(--muted);
+}
+
+/* ── Оглавление ─────────────────────────────────────────── */
+
+.toc {
+  margin: var(--space-lg) 0;
+  padding: var(--space-lg);
+  background: var(--ground-2);
+  border: var(--rule-hair) solid var(--rule);
+  border-radius: var(--radius-md);
+}
+
+.toc-title {
+  margin: 0 0 var(--space-sm);
+  font-size: var(--text-2xs);
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.toc ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: toc;
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.toc li {
+  counter-increment: toc;
+  margin: 0;
+}
+
+.toc a {
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  gap: var(--space-2xs);
+  padding-block: var(--space-3xs);
+  color: var(--ink);
+  border-bottom: var(--rule-hair) solid transparent;
+}
+
+.toc a::before {
+  content: counter(toc) '.';
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--seal);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .toc a:hover {
+    color: var(--seal);
+  }
+}
+
+/* ── Разделы и пункты ───────────────────────────────────── */
+
+.doc h2 {
+  margin: var(--space-xl) 0 var(--space-sm);
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  scroll-margin-top: var(--space-lg);
+}
+
+.doc h3 {
+  margin: var(--space-lg) 0 var(--space-xs);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.doc p {
+  margin: 0 0 var(--space-sm);
+}
+
+.doc .lead-in {
+  color: var(--ink-2);
+}
+
+/* Номер пункта висит на поле — так, как в печатном документе */
+.doc .clause {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+  gap: var(--space-2xs);
+  scroll-margin-top: var(--space-lg);
+}
+
+.doc .clause .n {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: var(--rule-hair) solid transparent;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .doc .clause .n:hover {
+    color: var(--seal);
+  }
+}
+
+/* Ссылка-решётка у заголовка: видна, но не спорит с текстом */
+.doc .h-anchor {
+  margin-left: var(--space-2xs);
+  color: var(--rule-strong);
+  font-weight: 400;
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .doc .h-anchor:hover {
+    color: var(--seal);
+  }
+}
+
+.doc ul,
+.doc ol {
+  margin: 0 0 var(--space-sm);
+  padding-left: var(--space-lg);
+}
+
+.doc li {
+  margin-bottom: var(--space-2xs);
+}
+
+.doc a {
+  color: var(--seal);
+  border-bottom: var(--rule-hair) solid color-mix(in oklch, var(--seal) 35%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .doc a:hover {
+    border-bottom-color: var(--seal);
+  }
+}
+
+.doc a:focus-visible,
+.toc a:focus-visible {
+  outline: var(--rule-thick) solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.doc table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-md);
+  font-size: var(--text-2xs);
+}
+
+.doc th,
+.doc td {
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--rule-hair) solid var(--rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+.doc th {
+  background: var(--ground-2);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Пункт, на который только что перешли по ссылке */
+.doc .is-cited {
+  background: var(--seal-wash);
+  outline: var(--rule-thick) solid var(--seal);
+  outline-offset: var(--space-2xs);
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .doc .is-cited {
+    transition: background-color var(--dur-long) var(--ease-out);
+  }
+}
