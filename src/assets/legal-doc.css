@@ -122,15 +122,19 @@
   color: var(--ink-2);
 }
 
-/* Номер пункта висит на поле — так, как в печатном документе */
+/* Номер пункта висит на поле — так, как в печатном документе. Не grid: в
+   сетке каждая ссылка внутри текста становится отдельной ячейкой и падает
+   в узкую колонку номера. Здесь текст остаётся одним потоком. */
 .doc .clause {
-  display: grid;
-  grid-template-columns: 3.25rem minmax(0, 1fr);
-  gap: var(--space-2xs);
+  position: relative;
+  padding-left: 3.5rem;
   scroll-margin-top: var(--space-lg);
 }
 
 .doc .clause .n {
+  position: absolute;
+  left: 0;
+  top: 0;
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   color: var(--muted);
@@ -168,6 +172,8 @@
 }
 
 .doc a {
+  /* Длинный адрес переносится только когда не влезает в строку целиком */
+  overflow-wrap: anywhere;
   color: var(--seal);
   border-bottom: var(--rule-hair) solid color-mix(in oklch, var(--seal) 35%, transparent);
 }
