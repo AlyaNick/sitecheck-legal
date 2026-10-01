@@ -115,7 +115,7 @@ $result = smtpSend(
     $config['password'],
     $config['email'],
     $config['email'],
-    'Заявка с сайта — ' . $name,
+    'Проверка сайтов',
     $html,
     $config['from_name'],
     $replyTo
