@@ -9,9 +9,9 @@ const { open } = useLegalDoc()
   <footer class="foot">
     <div class="container foot__inner">
       <div class="foot__brand">
-        <span class="foot__stamp" aria-hidden="true">SC</span>
+        <span class="foot__stamp" aria-hidden="true">ПС</span>
         <span>
-          <span class="foot__name">SiteCheck Legal</span>
+          <span class="foot__name">ПравоСайт</span>
           <span class="foot__tag">Юридический аудит сайтов</span>
         </span>
       </div>
@@ -32,7 +32,8 @@ const { open } = useLegalDoc()
       </nav>
 
       <p class="foot__credit">
-        <span v-if="org.nameShort">{{ org.nameShort }} · </span>© 2026
+        <span v-if="org.nameShort">{{ org.nameShort }} · </span>
+        <span v-if="org.inn" class="foot__inn">ИНН {{ org.inn }} · </span>© 2026
       </p>
     </div>
   </footer>
@@ -150,6 +151,10 @@ const { open } = useLegalDoc()
   font-size: var(--text-sm);
   color: var(--muted);
   font-variant-numeric: tabular-nums;
+}
+
+.foot__inn {
+  white-space: nowrap;
 }
 
 @media (max-width: 52rem) {

@@ -24,7 +24,7 @@ import SealMark from './SealMark.vue'
 
       <SealMark
         class="final__seal"
-        around="ДО ПРЕТЕНЗИИ · НЕ ПОСЛЕ · SITECHECK LEGAL ·"
+        around="ДО ПРЕТЕНЗИИ · НЕ ПОСЛЕ · ПРАВОСАЙТ ·"
         top="24–48"
         bottom="часов"
         label="Печать: первичный анализ за 24–48 часов"

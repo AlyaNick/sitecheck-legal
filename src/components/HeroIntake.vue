@@ -8,7 +8,6 @@ const { open: openDoc } = useLegalDoc()
 const site = ref('')
 const contact = ref('')
 const name = ref('')
-const consent = ref(false)
 const kind = ref('complex')
 
 const kinds = [
@@ -42,11 +41,6 @@ async function submit() {
     errorText.value = 'Не указан способ связи. Оставьте телефон, Telegram или почту.'
     return
   }
-  if (!consent.value) {
-    state.value = 'error'
-    errorText.value = 'Проверка начинается с согласия на обработку данных. Отметьте пункт ниже.'
-    return
-  }
 
   errorText.value = ''
   state.value = 'loading'
@@ -78,7 +72,6 @@ async function submit() {
     site.value = ''
     contact.value = ''
     name.value = ''
-    consent.value = false
     kind.value = 'complex'
   } catch {
     state.value = 'error'
@@ -201,17 +194,14 @@ const grounds = [
               </div>
             </fieldset>
 
-            <label class="consent">
-              <input v-model="consent" type="checkbox" />
-              <span>
-                Согласен на обработку персональных данных на условиях
-                <button type="button" class="consent__doc" @click.stop="openDoc('privacy', $event)">
-                  политики обработки</button>
-                и даю
-                <button type="button" class="consent__doc" @click.stop="openDoc('consent', $event)">
-                  согласие на обработку</button>.
-              </span>
-            </label>
+            <p class="consent">
+              Отправляя форму, вы соглашаетесь с
+              <button type="button" class="consent__doc" @click="openDoc('consent', $event)">
+                согласием на обработку персональных данных</button>
+              и
+              <button type="button" class="consent__doc" @click="openDoc('privacy', $event)">
+                политикой конфиденциальности</button>.
+            </p>
 
             <button
               class="btn btn--seal sheet__submit"
@@ -549,26 +539,14 @@ const grounds = [
   }
 }
 
-.field input:focus-visible,
-.consent input:focus-visible {
+.field input:focus-visible {
   outline-color: var(--focus);
   border-bottom-color: var(--seal);
 }
 
 .consent {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--space-xs);
-  align-items: start;
   font-size: var(--text-sm);
   color: var(--ink-2);
-}
-
-.consent input {
-  margin-top: var(--space-3xs);
-  accent-color: var(--seal);
-  width: 18px;
-  height: 18px;
 }
 
 .sheet__submit {

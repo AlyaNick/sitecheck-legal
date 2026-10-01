@@ -23,11 +23,8 @@ onUnmounted(() => {
   <header class="nav" :class="{ 'is-scrolled': scrolled }">
     <div class="nav__inner container">
       <a class="brand" href="#main">
-        <span class="brand__stamp" aria-hidden="true">SC</span>
-        <span class="brand__name">
-          SiteCheck
-          <span class="brand__suffix">Legal</span>
-        </span>
+        <span class="brand__stamp" aria-hidden="true">ПС</span>
+        <span class="brand__name">Право<span class="brand__suffix">Сайт</span></span>
       </a>
 
       <nav class="nav__links" aria-label="Разделы страницы">
@@ -143,9 +140,6 @@ onUnmounted(() => {
 }
 
 @media (max-width: 30rem) {
-  .brand__suffix {
-    display: none;
-  }
   .nav__cta {
     padding-inline: var(--space-md);
   }

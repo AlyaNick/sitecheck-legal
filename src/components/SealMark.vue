@@ -3,7 +3,7 @@
 // the circumference, a ruled centre. Appears once or twice on the page as a
 // signature under a claim — never as decoration on every section.
 defineProps({
-  around: { type: String, default: 'СВЕРЕНО С ДОКУМЕНТАМИ · SITECHECK LEGAL ·' },
+  around: { type: String, default: 'СВЕРЕНО С ДОКУМЕНТАМИ · ПРАВОСАЙТ ·' },
   top: { type: String, default: '152-ФЗ' },
   bottom: { type: String, default: '168-ФЗ' },
   label: { type: String, required: true },

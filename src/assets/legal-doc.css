@@ -206,6 +206,23 @@
   color: var(--ink);
 }
 
+/* Реквизиты оператора в ячейке таблицы: каждый реквизит с новой строки,
+   иначе ИНН, КПП и адрес сливаются в один абзац и рвутся посреди значения. */
+.doc .op-name,
+.doc .op-line {
+  display: block;
+}
+
+.doc .op-name {
+  margin-bottom: var(--space-3xs);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.doc .op-line {
+  overflow-wrap: anywhere;
+}
+
 /* Пункт, на который только что перешли по ссылке */
 .doc .is-cited {
   background: var(--seal-wash);
