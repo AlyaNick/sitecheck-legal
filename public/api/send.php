@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /**
- * Приём заявки с формы: POST JSON → письмо на почту студии по SMTP.
+ * Приём заявки на проверку сайта: POST JSON → письмо оператору по SMTP.
  *
- *   Вход:  { name, contact, topic?, task?, marketing? }
+ *   Вход:  { site, contact, name?, kind? }
  *   Выход: { ok: true }  либо  { error: "текст для пользователя", detail?: "…" }
  *
  * Настройки — в .env рядом с index.html (см. config.php и .env.example).
@@ -27,11 +27,24 @@ function respond(int $status, array $payload): void
     exit;
 }
 
-/** Текстовое поле формы: строка без тегов и крайних пробелов. */
-function field(array $input, string $key): string
+/** Текстовое поле формы: строка без тегов и крайних пробелов, не длиннее $max. */
+function field(array $input, string $key, int $max): string
 {
-    return trim(strip_tags((string) ($input[$key] ?? '')));
+    $value = trim(strip_tags((string) ($input[$key] ?? '')));
+    if (preg_match('/^.{0,' . $max . '}/us', $value, $m)) {
+        $value = $m[0];
+    }
+
+    return $value;
 }
+
+// Названия для kind приходят с формы; здесь только подпись для письма.
+const KINDS = [
+    'pd' => 'Проверка по 152-ФЗ',
+    'info' => 'Проверка по 168-ФЗ',
+    'complex' => 'Комплексная проверка',
+    'other' => 'Другой запрос',
+];
 
 /** Длина в символах без mbstring: считаем байты, кроме продолжений UTF-8. */
 function utf8Length(string $value): int
@@ -40,8 +53,8 @@ function utf8Length(string $value): int
 }
 
 /**
- * Та же проверка, что и на клиенте (isValidContact в ContactForm.vue):
- * телефон — от 10 цифр, иначе достаточно букв (ник в мессенджере, почта).
+ * Та же проверка, что и в server/index.js: телефон — от 10 цифр, иначе
+ * достаточно букв (ник в мессенджере, почта).
  */
 function isCallableContact(string $value): bool
 {
@@ -80,28 +93,23 @@ if (!is_array($input)) {
     respond(400, ['error' => 'Неверный формат данных']);
 }
 
-$name = field($input, 'name');
-$contact = field($input, 'contact');
-$topic = field($input, 'topic');
-$task = field($input, 'task');
-$marketing = !empty($input['marketing']);
+$site = field($input, 'site', 300);
+$contact = field($input, 'contact', 200);
+$name = field($input, 'name', 200);
+$kind = KINDS[(string) ($input['kind'] ?? '')] ?? KINDS['complex'];
 
-if (utf8Length($name) < 2 || !isCallableContact($contact)) {
-    respond(400, ['error' => 'Укажите имя и телефон или ник в мессенджере']);
+if ($site === '' || !isCallableContact($contact)) {
+    respond(400, ['error' => 'Укажите адрес сайта и телефон, Telegram или почту']);
 }
 
-// Это письмо, а не файлопомойка: комментарий режем до 4000 символов.
-if (utf8Length($task) > 4000 && preg_match('/^.{0,4000}/us', $task, $m)) {
-    $task = $m[0];
-}
+date_default_timezone_set('Europe/Moscow');
 
 $html = renderLeadEmail([
-    'name' => $name,
+    'site' => $site,
     'contact' => $contact,
-    'topic' => $topic,
-    'task' => $task,
-    'marketing' => $marketing,
-    'date' => date('d.m.Y H:i'),
+    'name' => $name,
+    'kind' => $kind,
+    'date' => date('d.m.Y, H:i') . ' (МСК)',
 ]);
 
 // Reply-To ставим, только если контакт — почта: телефон или ник в этом

@@ -34,6 +34,6 @@ return [
     'password' => $env('YANDEX_APP_PASSWORD'),
     'smtp_host' => $env('SMTP_HOST', 'smtp.yandex.ru'),
     'smtp_port' => (int) $env('SMTP_PORT', '465'),
-    // Имя отправителя в поле From.
-    'from_name' => $env('VITE_ORG_BRAND', 'Заявка с сайта'),
+    // Имя отправителя в списке писем — что за заявка, а не бренд лендинга.
+    'from_name' => 'Проверка сайтов',
 ];

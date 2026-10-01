@@ -21,7 +21,8 @@ const operatorEmail = (process.env.OPERATOR_EMAIL || '').trim()
 const appPassword = (process.env.YANDEX_APP_PASSWORD || '').trim()
 const smtpHost = (process.env.SMTP_HOST || 'smtp.yandex.ru').trim()
 const smtpPort = Number(process.env.SMTP_PORT || 465)
-const fromName = (process.env.VITE_ORG_BRAND || 'Заявка с сайта').trim()
+// Имя отправителя в списке писем — что за заявка, а не бренд лендинга.
+const fromName = 'Проверка сайтов'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PHONE_RE = /^[+\d\s()\-.]+$/
@@ -76,7 +77,7 @@ app.post('/api/send.php', async (req, res) => {
       to: operatorEmail,
       // Телефон или ник в Reply-To сломают «ответить» в почтовом клиенте.
       replyTo: EMAIL_RE.test(contact) ? contact : operatorEmail,
-      subject: `Заявка на проверку — ${site}`,
+      subject: 'Проверка сайтов',
       html: buildLeadEmailHtml({ site, contact, name, kind }),
     })
     return res.json({ ok: true })

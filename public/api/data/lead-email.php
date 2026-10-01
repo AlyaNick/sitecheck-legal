@@ -3,89 +3,96 @@
 declare(strict_types=1);
 
 /**
- * Письмо с заявкой. Вёрстка таблицами и инлайновые стили — почтовые клиенты
- * не понимают ни grid, ни внешний CSS. Есть JS-близнец: server/emailTemplate.js
- * (тот же шаблон для Node API) — правки нужно вносить в оба файла.
+ * Письмо оператору с заявкой на проверку сайта. Вёрстка таблицами и инлайновые
+ * стили — почтовые клиенты режут <style>, flex и grid. Есть JS-близнец:
+ * server/emailTemplate.js (тот же шаблон для Node API) — правки вносить в оба.
  */
 function leadEscape($value): string
 {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
+const LEAD_LINK = 'color:#8f2f26;text-decoration:underline;';
+
+/** Адрес сайта ссылкой: клиент пишет «example.ru», браузеру нужна схема. */
+function leadSiteHtml(string $raw): string
+{
+    $href = preg_match('~^https?://~i', $raw) ? $raw : 'https://' . $raw;
+    if (!filter_var($href, FILTER_VALIDATE_URL)) {
+        return leadEscape($raw);
+    }
+
+    return '<a href="' . leadEscape($href) . '" style="' . LEAD_LINK . '">' . leadEscape($raw) . '</a>';
+}
+
+/** Контакт ссылкой: почта — mailto:, телефон — tel:, ник в Telegram — t.me. */
+function leadContactHtml(string $raw): string
+{
+    $text = leadEscape($raw);
+
+    if (filter_var($raw, FILTER_VALIDATE_EMAIL)) {
+        return '<a href="mailto:' . $text . '" style="' . LEAD_LINK . '">' . $text . '</a>';
+    }
+    if (preg_match('/^[+\d\s()\-.]+$/', $raw)) {
+        $tel = leadEscape(preg_replace('/[^+\d]/', '', $raw));
+
+        return '<a href="tel:' . $tel . '" style="' . LEAD_LINK . '">' . $text . '</a>';
+    }
+    if (preg_match('/^@?([a-zA-Z][a-zA-Z0-9_]{4,31})$/', $raw, $m)) {
+        return '<a href="https://t.me/' . $m[1] . '" style="' . LEAD_LINK . '">' . $text . '</a>';
+    }
+
+    return $text;
+}
+
+function leadRow(string $label, string $valueHtml): string
+{
+    return <<<HTML
+          <tr>
+            <td style="padding:0 0 4px;color:#7a6f6c;font-size:12px;letter-spacing:.08em;text-transform:uppercase;">{$label}</td>
+          </tr>
+          <tr>
+            <td style="padding:0 0 18px;color:#231a18;font-size:16px;line-height:1.5;">{$valueHtml}</td>
+          </tr>
+HTML;
+}
+
+/**
+ * @param array{site: string, contact: string, name?: string, kind?: string, date?: string} $fields
+ */
 function renderLeadEmail(array $fields): string
 {
-    $rawContact = (string) ($fields['contact'] ?? '');
-
-    $name = leadEscape($fields['name'] ?? '');
-    $contact = leadEscape($rawContact);
-    $topic = leadEscape(($fields['topic'] ?? '') ?: '—');
-    $task = nl2br(leadEscape(($fields['task'] ?? '') ?: '—'));
-    $marketing = !empty($fields['marketing']) ? 'да' : 'нет';
-    $date = leadEscape($fields['date'] ?? '');
-
-    // Кликабельный контакт: почта — mailto:, телефон — tel:, ник оставляем текстом.
-    $contactHtml = $contact;
-    if (filter_var($rawContact, FILTER_VALIDATE_EMAIL)) {
-        $contactHtml = '<a href="mailto:' . $contact . '" style="color:#C4FA3B;text-decoration:none;">' . $contact . '</a>';
-    } elseif ($rawContact !== '' && preg_match('/^[+\d\s()\-.]+$/', $rawContact)) {
-        $tel = leadEscape(preg_replace('/[^+\d]/', '', $rawContact));
-        $contactHtml = '<a href="tel:' . $tel . '" style="color:#C4FA3B;text-decoration:none;">' . $contact . '</a>';
-    }
+    $rows = leadRow('Адрес сайта', leadSiteHtml((string) $fields['site']))
+        . leadRow('Контакт', leadContactHtml((string) $fields['contact']))
+        . leadRow('Имя', leadEscape(($fields['name'] ?? '') ?: '—'))
+        . leadRow('Что проверяем', leadEscape(($fields['kind'] ?? '') ?: '—'))
+        . leadRow('Получено', leadEscape($fields['date'] ?? ''));
 
     return <<<HTML
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Новая заявка с сайта</title>
+  <title>Заявка на проверку сайта</title>
 </head>
-<body style="margin:0;padding:0;background:#0B0C0A;font-family:Arial,Helvetica,sans-serif;color:#F4F6F1;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#0B0C0A;padding:24px 0;">
+<body style="margin:0;padding:24px 12px;background:#f7f3f2;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto;background:#fdfbfa;border:2px solid #231a18;border-radius:8px;">
     <tr>
-      <td align="center">
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="max-width:600px;width:100%;background:#141712;border:1px solid #23261F;border-radius:12px;overflow:hidden;">
-          <tr>
-            <td style="padding:28px 32px;background:#1A1D16;border-bottom:1px solid #23261F;">
-              <div style="font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#C4FA3B;">Питч Студио</div>
-              <h1 style="margin:12px 0 0;font-size:26px;line-height:1.15;color:#F4F6F1;">Новая заявка с сайта</h1>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:28px 32px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td style="padding:0 0 14px;color:#8A8F84;font-size:14px;width:170px;vertical-align:top;">Имя</td>
-                  <td style="padding:0 0 14px;color:#F4F6F1;font-size:16px;font-weight:600;">{$name}</td>
-                </tr>
-                <tr>
-                  <td style="padding:0 0 14px;color:#8A8F84;font-size:14px;vertical-align:top;">Контакт</td>
-                  <td style="padding:0 0 14px;color:#F4F6F1;font-size:16px;font-weight:600;">{$contactHtml}</td>
-                </tr>
-                <tr>
-                  <td style="padding:0 0 14px;color:#8A8F84;font-size:14px;vertical-align:top;">Задача</td>
-                  <td style="padding:0 0 14px;color:#F4F6F1;font-size:16px;">{$topic}</td>
-                </tr>
-                <tr>
-                  <td style="padding:0 0 14px;color:#8A8F84;font-size:14px;vertical-align:top;">Комментарий</td>
-                  <td style="padding:0 0 14px;color:#F4F6F1;font-size:16px;line-height:1.5;">{$task}</td>
-                </tr>
-                <tr>
-                  <td style="padding:0 0 14px;color:#8A8F84;font-size:13px;vertical-align:top;">Рассылка</td>
-                  <td style="padding:0 0 14px;color:#8A8F84;font-size:13px;">{$marketing}</td>
-                </tr>
-                <tr>
-                  <td style="padding:0;color:#8A8F84;font-size:13px;vertical-align:top;">Дата</td>
-                  <td style="padding:0;color:#8A8F84;font-size:13px;">{$date}</td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding:18px 32px;background:#111309;border-top:1px solid #23261F;color:#8A8F84;font-size:12px;line-height:1.5;">
-              Согласие на обработку персональных данных дано отправкой формы (пп. 5.1 и 6.1 Политики).
-            </td>
-          </tr>
+      <td style="padding:20px 24px;border-bottom:1px solid #d8cfcd;background:#f2ecea;border-radius:6px 6px 0 0;">
+        <div style="color:#8f2f26;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;">Проверка сайтов</div>
+        <div style="margin-top:6px;color:#231a18;font-size:22px;font-weight:700;line-height:1.25;">Новая заявка на проверку сайта</div>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:24px 24px 6px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+{$rows}
         </table>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:14px 24px;border-top:1px solid #d8cfcd;color:#7a6f6c;font-size:12px;line-height:1.5;">
+        Заявка отправлена с формы на сайте. Отправляя форму, клиент согласился с обработкой персональных данных и политикой конфиденциальности.
       </td>
     </tr>
   </table>
